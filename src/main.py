@@ -1,7 +1,10 @@
 import requests
 import re
 import urllib.request
+import pdfkit
+import sys
 from bs4 import BeautifulSoup
+
 url = 'https://www.passeidireto.com/arquivo/39116684/black-hat-python-programacao-p-justin-seitz'
 
 #url = 'https://www.passeidireto.com/arquivo/16451988/aprenda_a_programar-luciano_ramalho' 
@@ -79,28 +82,39 @@ def modf_css(css, links_font):
         css_content = str(file.read())
         file.close()
     
-    print(css)
+    
     for indexI in range(0 ,links_font):
         link = 'https://files.passeidireto.com/f4ddf77c-ac64-4d45-a6f9-be81925086cf/'
         css_content = css_content.replace(link, '')
-    print(css_content)
     with open(css, 'w') as arq:
         arq.write(css_content)
 
-def convert_pdf():
-    import pdfkit
-    pdfkit.from_file(['1.html', '2.html'], 'out.pdf')
-    
-     
-url_test = url;
+def convert_pdf(qntd):
+    files = []
+    for indexI in range(0,qntd-1):
+        file = str(indexI) +'.html'
+        files.append(file)
+
+    pdfkit.from_file(files, 'out.pdf')
+def inputUser():
+    try:
+        value = str(sys.argv[1])
+        valueNumber = str(sys.argv[2])
+    except:
+        value = str(input('Informe o Link'))
+        valueNumber = str(input('qntd pagina'))
+    return value, valueNumber
+
+url_test, qntd = inputUser()
+print(qntd)
 key_test = get_key(url_test)
 link_test = get_link_root(key_test)
 get_css(link_test, key_test)
-links_html_pages_test = get_html_pages(link_test, 10)
+links_html_pages_test = get_html_pages(link_test, int(qntd))
 css_link = key_test+'.css'
 fonts_links = get_fonts(css_link,link_test)
 download_html_page(links_html_pages_test, css_link)
 modf_css(css_link, len(fonts_links))
-convert_pdf()
+convert_pdf(int(qntd))
 #add_css_in_page(links_html_pages_test[30], css_link)
 
